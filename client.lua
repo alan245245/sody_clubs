@@ -182,7 +182,7 @@ AddEventHandler('sody_clubs:action', function(zone)
 		local menutitle = PlayerClub .. "menu"
 		local elements = {}
 
-		if tonumber(PlayerRankNum) >= Config.Clubs[PlayerClub].Perms.StorageRankMinPriv then
+		if PlayerRankNum >= Config.Clubs[PlayerClub].Perms.StorageRankMinPriv then
 			elements = {
 				{label = _U('deposit_stock'),  value = 'put_stock'},
 				{label = _U('withdraw_stock'), value = 'get_stock'}
@@ -332,6 +332,7 @@ function OpenClubOwnerMenu(club, rank)
 	local defaultOptions = {
 		withdraw  = true,
 		deposit   = true,
+		wash = true,
 		members = true,
 		pay = true
 	}
@@ -345,6 +346,7 @@ function OpenClubOwnerMenu(club, rank)
 	if isTreasurer == PlayerRankNum then
 		options.withdraw = true
 		options.deposit = true
+		options.wash = true
 		options.members = false
 		options.pay = false
 	end
@@ -356,6 +358,10 @@ function OpenClubOwnerMenu(club, rank)
 
 	if options.deposit then
 		table.insert(elements, {label = _U('deposit_bank_money'), value = 'deposit_bank_money'})
+	end
+
+	if options.wash then
+		table.insert(elements, {label = "wash money", value = 'wash_money'})
 	end
 
 	if options.members then
@@ -419,6 +425,29 @@ function OpenClubOwnerMenu(club, rank)
 			OpenManageMembersMenu(club)
 		elseif data.current.value == 'manage_pay' then
 			OpenManagePayMenu(club)
+		elseif data.current.value == "wash_money" then
+			ESX.UI.Menu.Open(
+				'dialog', GetCurrentResourceName(), 'wash_money_amount_',
+				{
+				  title = _U('wash_money_amount')
+				},
+				function(data, menu)
+	  
+				  local amount = tonumber(data.value)
+	  
+				  if amount == nil then
+					ESX.ShowNotification(_U('invalid_amount'))
+				  else
+					menu.close()
+					TriggerServerEvent('sody_clubs:washmoney', amount)
+				  end
+	  
+				end,
+				function(data, menu)
+				  menu.close()
+
+				end
+			)
 		end
 
 	end, function(data, menu)

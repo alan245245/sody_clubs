@@ -467,6 +467,20 @@ AddEventHandler('sody_clubs:putStockItems', function(type, itemName, count, club
 	end
 end)
 
+RegisterServerEvent('sody_clubs:washmoney')
+AddEventHandler('sody_clubs:washmoney', function(amount)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	local account = xPlayer.getAccount('black_money')
+	if amount > 0 and account.money >= amount then
+
+		xPlayer.removeAccountMoney('black_money', amount)
+		xPlayer.addMoney(amount)
+	
+	else
+		TriggerClientEvent('esx:showNotification', xPlayer.source, _U('invalid_amount'))
+	end
+end)
+
 RegisterServerEvent('sody_clubs:putStockItemsPub')
 AddEventHandler('sody_clubs:putStockItemsPub', function(type, itemName, count, clubname)
 	local xPlayer = nil
